@@ -24,7 +24,7 @@ A Flask application with MongoDB backend providing user authentication and dynam
 
 ---
 
-### 2. [Postres_sql](./Postres_sql) - PostgreSQL Implementation
+### 2. [Postgres_sql](./Postgres_sql) - PostgreSQL Implementation
 A Flask application with PostgreSQL backend providing user authentication and table management.
 
 **Key Features:**
@@ -41,7 +41,7 @@ A Flask application with PostgreSQL backend providing user authentication and ta
 - Jinja2 Templates
 - Bootstrap CSS
 
-[View Documentation →](./Postres_sql/README.md)
+[View Documentation →](./Postgres_sql/README.md)
 
 ---
 
@@ -61,7 +61,7 @@ A Flask application with PostgreSQL backend providing user authentication and ta
 Each project has its own setup instructions and dependencies. Navigate to the respective folder and follow the README:
 
 1. **MongoDB Project**: `cd Mongo_nosql` → [Setup Instructions](./Mongo_nosql/README.md)
-2. **PostgreSQL Project**: `cd Postres_sql` → [Setup Instructions](./Postres_sql/README.md)
+2. **PostgreSQL Project**: `cd Postgres_sql` → [Setup Instructions](./Postgres_sql/README.md)
 
 ## Prerequisites
 
@@ -80,7 +80,7 @@ DW_ASS/
 │   ├── templates/           # HTML templates
 │   └── static/              # CSS files
 │
-├── Postres_sql/             # PostgreSQL implementation
+├── Postgres_sql/            # PostgreSQL implementation
 │   ├── app.py               # Flask application
 │   ├── db.py                # Database operations
 │   ├── requirements.txt     # Python dependencies
