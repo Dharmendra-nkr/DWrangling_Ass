@@ -43,8 +43,10 @@
       const container = document.getElementById('fieldsContainer');
       const fieldRow = document.createElement('div');
       fieldRow.className = 'field-row';
+      // The user types the field *name* into the first input (no name attribute).
+      // On submit we map that name to the value input so the server receives `{ fieldName: value }`.
       fieldRow.innerHTML = `
-        <input name="new_field_${Date.now()}" type="text" placeholder="Field name" class="field-name" />
+        <input type="text" placeholder="Field name" class="field-name" />
         <input type="text" placeholder="Value" class="field-value" />
         <select class="field-type">
           <option value="string">Text</option>
@@ -55,61 +57,70 @@
       `;
       container.appendChild(fieldRow);
     }
+
+    // When the insert form submits, translate dynamic rows into real form fields
+    // so the server receives keys matching the user-provided field names.
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('insertForm');
+      if (!form) return;
+
+      form.addEventListener('submit', function (ev) {
+        const rows = document.querySelectorAll('#fieldsContainer .field-row');
+        for (const row of rows) {
+          const nameInput = row.querySelector('.field-name');
+          const valueInput = row.querySelector('.field-value');
+          const typeSelect = row.querySelector('.field-type');
+
+          // If this row corresponds to an existing column, skip remapping.
+          // Existing rows created by server-side template already have proper names.
+          if (!nameInput) continue;
+
+          const key = nameInput.value && nameInput.value.trim();
+          if (!key) {
+            ev.preventDefault();
+            alert('Please enter a name for all new fields or remove unused ones.');
+            return false;
+          }
+
+          // Assign the value input a name equal to the user-provided key.
+          // Also set the type select name to <key>_type to match existing convention.
+          valueInput.name = key;
+          typeSelect.name = key + '_type';
+
+          // Disable the name input so it's not submitted as a separate field.
+          nameInput.disabled = true;
+        }
+      });
+    });
   </script>
 
   <section class="card rows-full-width">
-      <h2 style="margin-top:0;">📋 Documents</h2>
-      {% if rows %}
-        <div class="table-wrap">
-          <table class="data">
-            <thead>
-              <tr>
-                {% for c in columns %}
-                  <th>{{ c }}</th>
-                {% endfor %}
-                {% if pk_col %}<th>Actions</th>{% endif %}
-              </tr>
-            </thead>
-            <tbody>
-              {% for r in rows %}
-                <tr>
-                  {% if pk_col %}
-                    <form method="post" action="{{ url_for('update_row', table=table) }}">
-                      <input type="hidden" name="__pk_{{ pk_col }}" value="{{ r[pk_col] }}" />
-                  {% endif %}
+    <h2 style="margin-top:0;">📋 Documents (JSON editor)</h2>
+    {% if rows %}
+      <div class="documents-list">
+        {% for r in rows %}
+          <div class="document-card" style="margin-bottom:12px; padding:12px; border-radius:6px; background:#0f1724;">
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+              <div style="min-width:120px; color:#9aa4b2;">_id: <span style="background:#0b1220; padding:4px 8px; border-radius:4px;">{{ r['_id'] }}</span></div>
+              <form method="post" action="{{ url_for('update_row', table=table) }}" style="flex:1;">
+                <input type="hidden" name="__pk__id" value="{{ r['_id'] }}" />
+                <textarea name="document_json" rows="6" style="width:100%; font-family:monospace; font-size:13px; color:#e6eef8; background:#071022; border:1px solid #223; padding:8px; border-radius:6px;">{{ r | tojson(indent=2) }}</textarea>
+                <div style="margin-top:8px; display:flex; gap:8px;">
+                  <button class="btn" type="submit">💾 Save JSON</button>
+              </form>
 
-                  {% for c in columns %}
-                    <td>
-                      {% if pk_col and c != pk_col %}
-                        <input name="{{ c }}" value="{{ r[c] }}" />
-                      {% else %}
-                        {% if c == '_id' %}
-                          <span class="mongo-id">{{ r[c][:8] }}...</span>
-                        {% else %}
-                          {{ r[c] }}
-                        {% endif %}
-                      {% endif %}
-                    </td>
-                  {% endfor %}
-
-                  {% if pk_col %}
-                    <td>
-                      <button class="btn" type="submit">💾 Save</button>
-                      </form>
-                      <form method="post" action="{{ url_for('delete_row', table=table) }}" onsubmit="return confirm('Delete this document?');">
-                        <input type="hidden" name="__pk_{{ pk_col }}" value="{{ r[pk_col] }}" />
-                        <button class="btn" type="submit">🗑️ Delete</button>
-                      </form>
-                    </td>
-                  {% endif %}
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      {% else %}
-        <p class="muted">No documents yet. Use the form above to insert your first document!</p>
-      {% endif %}
-    </section>
+              <form method="post" action="{{ url_for('delete_row', table=table) }}" onsubmit="return confirm('Delete this document?');">
+                <input type="hidden" name="__pk__id" value="{{ r['_id'] }}" />
+                <button class="btn" type="submit">🗑️ Delete</button>
+              </form>
+                </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">No documents yet. Use the form above to insert your first document!</p>
+    {% endif %}
+  </section>
   </div>
 {% endblock %}

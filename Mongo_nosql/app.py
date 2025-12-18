@@ -143,18 +143,35 @@ def update_row(table: str) -> Any:
         flash("Document ID missing", "error")
         return redirect(url_for("view_table", table=table))
     
-    fields = get_collection_fields(table)
+    # Support two update modes:
+    # 1) A single `document_json` form field containing the full document as JSON
+    # 2) Individual form fields per original behavior (backwards compatible)
+    document_json = request.form.get("document_json")
     updates = {}
-    for field in fields:
-        if field == "_id":
-            continue
-        if field in request.form:
-            updates[field] = request.form.get(field)
-    
+    if document_json:
+        try:
+            import json
+
+            parsed = json.loads(document_json)
+            # Remove _id if present - we don't allow editing it
+            parsed.pop("_id", None)
+            if isinstance(parsed, dict):
+                updates = parsed
+        except Exception:
+            flash("Invalid JSON provided for update.", "error")
+            return redirect(url_for("view_table", table=table))
+    else:
+        fields = get_collection_fields(table)
+        for field in fields:
+            if field == "_id":
+                continue
+            if field in request.form:
+                updates[field] = request.form.get(field)
+
     if not updates:
         flash("Nothing to update", "info")
         return redirect(url_for("view_table", table=table))
-    
+
     try:
         update_document(table, doc_id, updates)
         flash("Document updated.", "success")
