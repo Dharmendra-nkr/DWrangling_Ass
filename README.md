@@ -105,7 +105,7 @@ This project is for educational purposes as part of a Data Wrangling assignment.
 
 ## Author
 
-Dharmendra Kumar
+Dharmendra N K R
 
 ---
 
