@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+  <section class="card form-card">
+    <h1>Log In</h1>
+    <form method="post" action="{{ url_for('login') }}" class="form">
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" placeholder="Your name" required />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" placeholder="Your password" required />
+
+      <button type="submit" class="btn primary full">Log in</button>
+    </form>
+    <p class="muted">No account yet? <a href="{{ url_for('signup') }}">Sign up</a>.</p>
+  </section>
+{% endblock %}

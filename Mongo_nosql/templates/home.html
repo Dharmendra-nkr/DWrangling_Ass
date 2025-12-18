@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% if user_name %}
+  <section class="card" style="margin-bottom:16px;">
+    <h1>🍃 MongoDB Dashboard</h1>
+    <p class="muted">Manage your MongoDB collections and documents below.</p>
+  </section>
+
+  <div class="grid2">
+    <section class="card" id="create-table">
+      <h2 style="margin-top:0;">🗂️ Create Collection</h2>
+      <form method="post" action="{{ url_for('create_table') }}" class="form">
+        <label for="table_name">Collection name</label>
+        <input id="table_name" name="table_name" type="text" placeholder="e.g. users, products, orders" required />
+        <p class="muted small">💡 MongoDB collections have flexible schemas. Documents can have any fields. Each gets an auto-generated <code>_id</code> field.</p>
+
+        <button type="submit" class="btn primary">Create Collection</button>
+      </form>
+    </section>
+
+    <section class="card" id="tables">
+      <h2 style="margin-top:0;">📚 Collections</h2>
+      {% if tables %}
+        <ul class="list">
+          {% for t in tables %}
+            <li><a href="{{ url_for('view_table', table=t) }}">📄 {{ t }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">No collections yet. Create one above to get started!</p>
+      {% endif %}
+    </section>
+  </div>
+  {% else %}
+  <section class="card">
+    <h1>Welcome</h1>
+    <p>Please <a href="{{ url_for('login') }}">log in</a> or <a href="{{ url_for('signup') }}">create an account</a> to access the dashboard.</p>
+  </section>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ title or 'DW App' }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+  </head>
+  <body>
+    <header class="container">
+      <nav class="nav">
+        <a href="{{ url_for('home') }}" class="brand">🍃 MongoDB DW</a>
+        <a class="navlink" href="{{ url_for('home') }}">🏠 Home</a>
+        <a class="navlink" href="{{ url_for('home') }}#tables">📚 Collections</a>
+        {% if session.get('user_name') %}
+          <a class="navlink" href="{{ url_for('home') }}#create-table">➕ New Collection</a>
+        {% endif %}
+        <div class="spacer"></div>
+        {% if session.get('user_name') %}
+          <form method="post" action="{{ url_for('logout') }}">
+            <span class="welcome">Hi, {{ session['user_name'] }}</span>
+            <button type="submit" class="btn">Logout</button>
+          </form>
+        {% else %}
+          <a class="btn link" href="{{ url_for('login') }}">Login</a>
+          <a class="btn primary" href="{{ url_for('signup') }}">Sign up</a>
+        {% endif %}
+      </nav>
+    </header>
+
+    <main class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flash">
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container muted small">
+      <p>Simple demo authentication</p>
+    </footer>
+  </body>
+  </html>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+  {% if user_name %}
+  <section class="card" style="margin-bottom:16px;">
+    <h1>Dashboard PostresSQL</h1>
+    <p class="muted">Manage your database tables below.</p>
+  </section>
+
+  <div class="grid2">
+    <section class="card" id="create-table">
+      <h2 style="margin-top:0;">Create Table</h2>
+      <form method="post" action="{{ url_for('create_table') }}" class="form">
+        <label for="table_name">Table name</label>
+        <input id="table_name" name="table_name" type="text" placeholder="e.g. projects" required />
+
+        <label for="columns">Columns (optional)</label>
+        <input id="columns" name="columns" type="text" placeholder="e.g. name:text, active:boolean, budget:integer" />
+        <p class="muted small">Always includes <code>id SERIAL PRIMARY KEY</code>. Supported types: text, integer, boolean, timestamp.</p>
+
+        <button type="submit" class="btn primary">Create table</button>
+      </form>
+    </section>
+
+    <section class="card" id="tables">
+      <h2 style="margin-top:0;">Tables</h2>
+      {% if tables %}
+        <ul class="list">
+          {% for t in tables %}
+            <li><a href="{{ url_for('view_table', table=t) }}">{{ t }}</a></li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="muted">No tables found.</p>
+      {% endif %}
+    </section>
+  </div>
+  {% else %}
+  <section class="card">
+    <h1>Welcome</h1>
+    <p>Please <a href="{{ url_for('login') }}">log in</a> or <a href="{{ url_for('signup') }}">create an account</a> to access the dashboard.</p>
+  </section>
+  {% endif %}
+{% endblock %}
